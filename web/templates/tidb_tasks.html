@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TiDB Tasks</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+            max-width: 100vw;
+            box-sizing: border-box;
+        }
+        nav {
+            width: 100%;
+            background-color: #007bff;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('workload_summary') }}">Workload Summary</a></li>
+            <li><a href="{{ url_for('top_tables') }}">Top Tables</a></li>
+            <li><a href="{{ url_for('fullscan') }}">Fullscan</a></li>
+            <li><a href="{{ url_for('tidb_tasks') }}">TiDB Tasks</a></li>
+            <li><a href="{{ url_for('tikv_tasks') }}">TiKV Tasks</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>TiDB Tasks</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Column 1</th>
+                    <th>Column 2</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workload Summary</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 30vh;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+            max-width: 100vw;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            margin-right: 500px;
+        }
+        .content {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px; /* Space between chart and table */
+        }
+        nav {
+            width: 100%;
+            background-color: #007bff;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            margin-top: 60px; /* Add some space to accommodate the fixed nav bar */
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .sql-link {
+            color: blue;
+            cursor: pointer;
+        }
+        .number-cell {
+            text-align: right;
+            padding-right: 10px;
+        }
+        #sql-details {
+            margin-top: 20px;
+            display: none;
+            overflow: auto;
+            max-width: 100%;
+        }
+        .code-container, .digest-container {
+            position: relative;
+            width: 800px;
+            overflow-x: auto;
+            white-space: pre;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            display: inline-block;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('workload_summary') }}">Workload Summary</a></li>
+            <li><a href="{{ url_for('top_tables') }}">Top Tables</a></li>
+            <li><a href="{{ url_for('fullscan') }}">Fullscan</a></li>
+            <li><a href="{{ url_for('tidb_tasks') }}">TiDB Tasks</a></li>
+            <li><a href="{{ url_for('tikv_tasks') }}">TiKV Tasks</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="content">
+            <div class="chart-container">
+                <h1>Workload Summary</h1>
+                <canvas id="workloadChart"></canvas>
+            </div>
+            <div class="table-container">
+                <h2>Statements Count</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Insert</th>
+                            <th>Delete</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="number-cell">{{ data.select_count }}</td>
+                            <td class="number-cell">{{ data.insert_count }}</td>
+                            <td class="number-cell">{{ data.delete_count }}</td>
+                            <td class="number-cell">{{ data.update_count }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 从服务器传递的真实数据
+        const data = {{ data | tojson }};
+        const ctx = document.getElementById('workloadChart').getContext('2d');
+        const workloadChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Select', 'Insert', 'Delete', 'Update'],
+                datasets: [{
+                    data: [data.select_count, data.insert_count, data.delete_count, data.update_count],
+                    backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

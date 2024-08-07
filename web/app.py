@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 from flask import Flask, request, jsonify, render_template
+import os
+import argparse
 import duckdb
 import pandas as pd
 
 app = Flask(__name__)
 
 
-DUCKDB_FILE = '/Users/anthonynie/usefultool/duckdb_research/test.duckdb'
+parser = argparse.ArgumentParser(description='Flask app with DuckDB file.')
+parser.add_argument('--duckdb-file', type=str, required=True, help='Path to the DuckDB file.')
+args = parser.parse_args()
+duckdb_file = args.duckdb_file
+
 
 @app.route('/')
 def fullscan():
@@ -14,7 +20,7 @@ def fullscan():
 
 @app.route('/fullscan')
 def top_sql():
-    conn = duckdb.connect(DUCKDB_FILE)
+    conn = duckdb.connect(duckdb_file)
     df = conn.execute('select * from tablefullscan order by digestExecSumXactRows DESC limit 10').df()
     conn.close()
     return df.to_json(orient='records')
@@ -22,7 +28,7 @@ def top_sql():
 @app.route('/sql_details', methods=['POST'])
 def sql_details():
     table_name = request.json.get('tablename')
-    conn = duckdb.connect(DUCKDB_FILE)
+    conn = duckdb.connect(duckdb_file)
     query = '''
         SELECT 
             plansCSV.tablename,
